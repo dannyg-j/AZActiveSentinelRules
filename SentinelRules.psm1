@@ -189,11 +189,7 @@ function Get-SentinelRules
         [psobject]$Connection
     )
 
-    $uri = Get-SentinelAlertRulesUri `
-        -SubscriptionId $Connection.SubscriptionId `
-        -ResourceGroupName $ResourceGroupName `
-        -WorkspaceName $WorkspaceName `
-        -ApiVersion $ApiVersion
+    $uri = Get-SentinelAlertRulesUri -SubscriptionId $Connection.SubscriptionId -ResourceGroupName $ResourceGroupName -WorkspaceName $WorkspaceName -ApiVersion $ApiVersion
 
     return @(
         Invoke-ArmGetAllPages -Url $uri -Headers $Connection.Headers
@@ -302,14 +298,12 @@ function Get-SentinelRuleSourceId
         [psobject]$Rule
     )
 
-    if ((Test-HasProperty -InputObject $Rule -Name 'SourceRuleId') -and `
-        (-not [string]::IsNullOrWhiteSpace([string]$Rule.SourceRuleId)))
+    if ((Test-HasProperty -InputObject $Rule -Name 'SourceRuleId') -and (-not [string]::IsNullOrWhiteSpace([string]$Rule.SourceRuleId)))
     {
         return [string]$Rule.SourceRuleId
     }
 
-    if ((Test-HasProperty -InputObject $Rule -Name 'name') -and `
-        (-not [string]::IsNullOrWhiteSpace([string]$Rule.name)))
+    if ((Test-HasProperty -InputObject $Rule -Name 'name') -and (-not [string]::IsNullOrWhiteSpace([string]$Rule.name)))
     {
         return [string]$Rule.name
     }
@@ -339,8 +333,7 @@ function Test-SentinelRuleExists
         $templateMatch = $ExistingRules |
             Where-Object {
                 $existingTemplateId = Get-SentinelRuleTemplateId -Rule $_
-                (-not [string]::IsNullOrWhiteSpace($existingTemplateId)) -and `
-                ($existingTemplateId -eq $templateId)
+                (-not [string]::IsNullOrWhiteSpace($existingTemplateId)) -and ($existingTemplateId -eq $templateId)
             } |
             Select-Object -First 1
 
@@ -483,19 +476,9 @@ function New-SentinelRule
 
     $jsonBody = $requestBody | ConvertTo-Json -Depth 100
 
-    $uri = Get-SentinelAlertRulesUri `
-        -SubscriptionId $Connection.SubscriptionId `
-        -ResourceGroupName $ResourceGroupName `
-        -WorkspaceName $WorkspaceName `
-        -ApiVersion $ApiVersion `
-        -RuleId $ruleId
+    $uri = Get-SentinelAlertRulesUri -SubscriptionId $Connection.SubscriptionId -ResourceGroupName $ResourceGroupName -WorkspaceName $WorkspaceName -ApiVersion $ApiVersion -RuleId $ruleId
 
-    return Invoke-RestMethod `
-        -Method Put `
-        -Uri $uri `
-        -Headers $Connection.Headers `
-        -Body $jsonBody `
-        -ErrorAction Stop
+    return Invoke-RestMethod -Method Put -Uri $uri -Headers $Connection.Headers -Body $jsonBody -ErrorAction Stop
 }
 
 #endregion
@@ -548,11 +531,7 @@ function Export-SentinelRules
     Write-Host "Retrieving analytics rules..." -ForegroundColor Cyan
 
     $allRules = @(
-        Get-SentinelRules `
-            -ResourceGroupName $ResourceGroupName `
-            -WorkspaceName $WorkspaceName `
-            -ApiVersion $ApiVersion `
-            -Connection $connection
+        Get-SentinelRules -ResourceGroupName $ResourceGroupName -WorkspaceName $WorkspaceName -ApiVersion $ApiVersion -Connection $connection
     )
 
     $activeRules = @(
@@ -687,11 +666,7 @@ function Import-SentinelRules
     Write-Host "Retrieving existing target rules..." -ForegroundColor Cyan
 
     $existingRules = @(
-        Get-SentinelRules `
-            -ResourceGroupName $ResourceGroupName `
-            -WorkspaceName $WorkspaceName `
-            -ApiVersion $ApiVersion `
-            -Connection $connection
+        Get-SentinelRules -ResourceGroupName $ResourceGroupName -WorkspaceName $WorkspaceName -ApiVersion $ApiVersion -Connection $connection
     )
 
     $created = 0
@@ -744,12 +719,7 @@ function Import-SentinelRules
 
         try
         {
-            $createdRule = New-SentinelRule `
-                -Rule $rule `
-                -ResourceGroupName $ResourceGroupName `
-                -WorkspaceName $WorkspaceName `
-                -ApiVersion $ApiVersion `
-                -Connection $connection
+            $createdRule = New-SentinelRule -Rule $rule -ResourceGroupName $ResourceGroupName -WorkspaceName $WorkspaceName -ApiVersion $ApiVersion -Connection $connection
 
             $created++
 
